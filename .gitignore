@@ -1,0 +1,6 @@
+#directories
+/node_modules
+/build
+/dist
+#files
+package-lock.json

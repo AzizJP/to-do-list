@@ -1,0 +1,10 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #fafafa;
+  font-family: 'Inter', 'Verdana', 'Tahoma', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+}
