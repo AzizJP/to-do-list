@@ -1,7 +1,7 @@
 {
-  "name": "todo-list",
+  "name": "to-do-list",
   "version": "1.0.0",
-  "description": "todo-list",
+  "description": "to-do-list",
   "main": "index.jsx",
   "scripts": {
     "build": "rm -rf dist && webpack --mode production",
@@ -11,7 +11,7 @@
   },
   "author": "Aziz Jumayev",
   "license": "ISC",
-  "homepage": "https://github.com/AzizJP/todo-list",
+  "homepage": "https://github.com/AzizJP/to-do-list",
   "devDependencies": {
     "@babel/core": "^7.19.6",
     "@babel/preset-env": "^7.19.4",
