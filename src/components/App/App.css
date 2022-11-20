@@ -17,7 +17,7 @@
 }
 
 @media screen and (min-width: 1280px) {
-  .link-hover:before {
+  .text-hover:before {
     content: '';
     width: 100%;
     height: 1px;
@@ -29,7 +29,7 @@
     transform: scale(0);
     transition: transform linear 0.2s;
   }
-  .link-hover:hover:before {
+  .text-hover:hover:before {
     transform-origin: left;
     transform: scale(1);
     transition: transform linear 0.2s;
@@ -40,5 +40,8 @@
   .button-hover:hover {
     background-color: #2be080;
     transition: background-color linear 0.2s;
+  }
+  .button-hover:disabled:hover {
+    background-color: #aaaaaa33;
   }
 }

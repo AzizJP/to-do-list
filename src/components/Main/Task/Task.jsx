@@ -9,6 +9,14 @@ import dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import ToggleCheckbox from '../../Shared/ToggleCheckbox/ToggleCheckbox';
 
+import { storage } from '../../../Firebase';
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from 'firebase/storage';
+
 import './Task.css';
 
 dayjs.extend(calendar);
@@ -22,9 +30,51 @@ const Task = memo(({ task, handleDeleteTask }) => {
     completed: false,
     timeOut: false,
     canEdit: false,
+    file: '',
     ...task,
   });
-  const [isTimeOut, setIsTimeOut] = useState(false);
+  const [fileUpload, setFileUpload] = useState(null);
+
+  const handleUploadFile = useCallback(() => {
+    if (fileUpload === null) {
+      return;
+    }
+    const fileRef = ref(storage, `files/${fileUpload.name}`);
+    uploadBytes(fileRef, fileUpload).then(i => {
+      getDownloadURL(i.ref).then(url => {
+        const newState = {
+          ...formState,
+          file: url,
+        };
+        setFormState(newState);
+        handleTaskEdit(newState);
+      });
+    });
+  }, [fileUpload]);
+
+  const handleDeleteFile = useCallback(() => {
+    console.log('delete');
+    const desertRef = ref(storage, formState.file);
+    deleteObject(desertRef)
+      .then(() => {})
+      .catch(error => {
+        console.log(error);
+      });
+    const newState = {
+      ...formState,
+      file: '',
+    };
+    setFormState(newState);
+    handleTaskEdit(newState);
+  }, [formState]);
+
+  useEffect(() => {
+    const today = dayjs(
+      dayjs().calendar(dayjs('DD/MM/YYYY'))
+    ).valueOf();
+    const taskCompleteDate = dayjs(formState.date).valueOf();
+    setFormState({ ...formState, timeOut: today > taskCompleteDate });
+  }, [formState.date]);
 
   const handleTaskEdit = useCallback(newState => {
     const tasks = JSON.parse(localStorage.getItem('tasks'));
@@ -47,14 +97,6 @@ const Task = memo(({ task, handleDeleteTask }) => {
     setFormState({ ...formState, canEdit: !formState.canEdit });
   }, [formState]);
 
-  useEffect(() => {
-    const today = dayjs(
-      dayjs().calendar(dayjs('DD/MM/YYYY'))
-    ).valueOf();
-    const taskCompleteDate = dayjs(formState.date).valueOf();
-    setFormState({ ...formState, timeOut: today > taskCompleteDate });
-  }, [formState.date]);
-
   const handleTitleChange = useCallback(
     evt => {
       setFormState({ ...formState, title: evt.target.value });
@@ -76,11 +118,22 @@ const Task = memo(({ task, handleDeleteTask }) => {
     [formState]
   );
 
+  const handleFileChange = useCallback(
+    evt => {
+      setFileUpload(evt.target.files[0]);
+    },
+    [formState]
+  );
+
   const handleConfirm = useCallback(
     evt => {
+      const newState = {
+        ...formState,
+        canEdit: !formState.canEdit,
+      };
       evt.preventDefault();
-      handleTaskEdit(formState);
       handleEditButtonClick();
+      handleTaskEdit(newState);
     },
     [handleEditButtonClick, handleTaskEdit, formState]
   );
@@ -119,7 +172,7 @@ const Task = memo(({ task, handleDeleteTask }) => {
       );
     }
     return <h2 className="task__title">{taskTitleState}</h2>;
-  }, [formState.canEdit, formState, handleTitleChange]);
+  }, [formState, handleTitleChange]);
 
   const dateNow = useMemo(() => {
     return `Создан: ${dayjs(dayjs().calendar('DD/MM/YYYY')).format(
@@ -145,7 +198,7 @@ const Task = memo(({ task, handleDeleteTask }) => {
     return dayjs(dayjs(formState.date).calendar('DD/MM/YYYY')).format(
       'DD/MM/YYYY'
     );
-  }, [formState.canEdit, formState, handleDateChange]);
+  }, [formState, handleDateChange]);
 
   const taskButtonChange = useMemo(() => {
     if (!formState.canEdit) {
@@ -165,12 +218,7 @@ const Task = memo(({ task, handleDeleteTask }) => {
         Принять
       </button>
     );
-  }, [
-    formState.canEdit,
-    formState,
-    handleCompleteButtonClick,
-    handleConfirm,
-  ]);
+  }, [formState, handleCompleteButtonClick, handleConfirm]);
 
   return (
     <form
@@ -196,6 +244,41 @@ const Task = memo(({ task, handleDeleteTask }) => {
           onChange={handleTextChange}
           form="task-form"
         ></textarea>
+        {formState.canEdit && (
+          <div className="task__file-container">
+            <input
+              type="file"
+              accept=".pdf,.jpg,.png,.gif,.web"
+              className="task__file-input"
+              onChange={handleFileChange}
+            />
+            <button
+              type="button"
+              className="task__button button-hover"
+              onClick={handleUploadFile}
+              disabled={formState.completed ? true : false}
+            >
+              Загрузить
+            </button>
+            <button
+              type="button"
+              className="task__button button-hover"
+              onClick={handleDeleteFile}
+              disabled={formState.file ? false : true}
+            >
+              Удалить
+            </button>
+          </div>
+        )}
+        <div>
+          <a
+            href={formState.file}
+            target="_blank"
+            className="file__text text-hover"
+          >
+            {formState.file && 'Просмотр файла'}
+          </a>
+        </div>
       </div>
       <div className="task__buttons">
         {taskButtonChange}

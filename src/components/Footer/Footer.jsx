@@ -9,7 +9,13 @@ const Footer = memo(() => {
       <h3 className="footer__title">Pet project</h3>
       <section className="footer__author">
         <div className="footer__links">
-          <p className="footer__text text-hover">Джумаев Азиз</p>
+          <a
+            href="https://t.me/aziz_jp"
+            target="_blank"
+            className="footer__text text-hover"
+          >
+            Джумаев Азиз
+          </a>
           <a
             href="https://github.com/AzizJP"
             target="_blank"
@@ -18,7 +24,9 @@ const Footer = memo(() => {
             Github
           </a>
         </div>
-        <span className="footer__copyright">&copy;{dayjs().year()}</span>
+        <span className="footer__copyright">
+          &copy;{dayjs().year()}
+        </span>
       </section>
     </footer>
   );
