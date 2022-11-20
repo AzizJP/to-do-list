@@ -34,14 +34,4 @@
     transform: scale(1);
     transition: transform linear 0.2s;
   }
-  .button-hover {
-    transition: background-color linear 0.2s;
-  }
-  .button-hover:hover {
-    background-color: #2be080;
-    transition: background-color linear 0.2s;
-  }
-  .button-hover:disabled:hover {
-    background-color: #aaaaaa33;
-  }
 }

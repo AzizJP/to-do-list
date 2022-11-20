@@ -1,0 +1,38 @@
+.task__buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.task__button {
+  padding: 0;
+  width: 4rem;
+  height: 1.5rem;
+  border-radius: 0.2rem;
+  border: none;
+  background-color: #3456f3;
+  font-weight: 500;
+  font-size: 0.7rem;
+  line-height: 1rem;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.task__button:disabled {
+  cursor: default;
+  background-color: #aaaaaa33;
+}
+
+@media screen and (min-width: 1280px) {
+  .button-hover {
+    transition: background-color linear 0.2s;
+  }
+  .button-hover:hover {
+    background-color: #2be080;
+    transition: background-color linear 0.2s;
+  }
+  .button-hover:disabled:hover {
+    background-color: #aaaaaa33;
+  }
+}

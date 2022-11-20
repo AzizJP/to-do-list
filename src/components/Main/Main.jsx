@@ -1,5 +1,5 @@
 import { memo, useCallback, useState } from 'react';
-import FormInput from '../Shared/FormInput/FormInput';
+import AddTask from '../Shared/AddTask/AddTask';
 
 import './Main.css';
 import Task from './Task/Task';
@@ -35,7 +35,7 @@ const Main = memo(() => {
   return (
     <main className="main">
       <section className="main__container">
-        <FormInput handleAddTask={handleAddTask} />
+        <AddTask handleAddTask={handleAddTask} />
         <div className="main__tasks">
           {taskCards.map(task => (
             <Task

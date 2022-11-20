@@ -7,15 +7,16 @@ import {
 } from 'react';
 import dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
-import ToggleCheckbox from '../../Shared/ToggleCheckbox/ToggleCheckbox';
-
-import { storage } from '../../../Firebase';
 import {
   deleteObject,
   getDownloadURL,
   ref,
   uploadBytes,
 } from 'firebase/storage';
+
+import { storage } from '../../../Firebase';
+import FileUpload from './FileUpload/FileUpload';
+import TaskButtons from './TaskButtons/TaskButtons';
 
 import './Task.css';
 
@@ -42,30 +43,25 @@ const Task = memo(({ task, handleDeleteTask }) => {
     const fileRef = ref(storage, `files/${fileUpload.name}`);
     uploadBytes(fileRef, fileUpload).then(i => {
       getDownloadURL(i.ref).then(url => {
-        const newState = {
+        setFormState({
           ...formState,
           file: url,
-        };
-        setFormState(newState);
-        handleTaskEdit(newState);
+        });
       });
     });
   }, [fileUpload]);
 
   const handleDeleteFile = useCallback(() => {
-    console.log('delete');
     const desertRef = ref(storage, formState.file);
     deleteObject(desertRef)
       .then(() => {})
       .catch(error => {
         console.log(error);
       });
-    const newState = {
+    setFormState({
       ...formState,
       file: '',
-    };
-    setFormState(newState);
-    handleTaskEdit(newState);
+    });
   }, [formState]);
 
   useEffect(() => {
@@ -84,7 +80,7 @@ const Task = memo(({ task, handleDeleteTask }) => {
     localStorage.setItem('tasks', JSON.stringify(copyTask));
   }, []);
 
-  const handleCompleteButtonClick = useCallback(() => {
+  const handleCompleteTaskClick = useCallback(() => {
     const newState = {
       ...formState,
       completed: !formState.completed,
@@ -152,7 +148,7 @@ const Task = memo(({ task, handleDeleteTask }) => {
   const taskTitleState = useMemo(() => {
     let res = formState.title;
     if (formState.completed) {
-      return (res += ' Задача выполнена!');
+      return (res += ' Поздравляю, задача выполнена!');
     }
     if (formState.timeOut) {
       return (res += ' К сожалению, время вышло!');
@@ -200,26 +196,6 @@ const Task = memo(({ task, handleDeleteTask }) => {
     );
   }, [formState, handleDateChange]);
 
-  const taskButtonChange = useMemo(() => {
-    if (!formState.canEdit) {
-      return (
-        <ToggleCheckbox
-          toggleCheckboxClick={handleCompleteButtonClick}
-          isToggled={formState.completed}
-        />
-      );
-    }
-    return (
-      <button
-        type="button"
-        className="task__button button-hover"
-        onClick={handleConfirm}
-      >
-        Принять
-      </button>
-    );
-  }, [formState, handleCompleteButtonClick, handleConfirm]);
-
   return (
     <form
       id="task-form"
@@ -238,38 +214,18 @@ const Task = memo(({ task, handleDeleteTask }) => {
           maxLength={150}
           minLength={2}
           placeholder="Распишите задачу подробнее"
-          disabled={formState.canEdit ? false : true}
+          disabled={!formState.canEdit}
           spellCheck={true}
           value={formState.description}
           onChange={handleTextChange}
           form="task-form"
         ></textarea>
-        {formState.canEdit && (
-          <div className="task__file-container">
-            <input
-              type="file"
-              accept=".pdf,.jpg,.png,.gif,.web"
-              className="task__file-input"
-              onChange={handleFileChange}
-            />
-            <button
-              type="button"
-              className="task__button button-hover"
-              onClick={handleUploadFile}
-              disabled={formState.completed ? true : false}
-            >
-              Загрузить
-            </button>
-            <button
-              type="button"
-              className="task__button button-hover"
-              onClick={handleDeleteFile}
-              disabled={formState.file ? false : true}
-            >
-              Удалить
-            </button>
-          </div>
-        )}
+        <FileUpload
+          formState={formState}
+          handleFileChange={handleFileChange}
+          handleUploadFile={handleUploadFile}
+          handleDeleteFile={handleDeleteFile}
+        />
         <div>
           <a
             href={formState.file}
@@ -280,27 +236,13 @@ const Task = memo(({ task, handleDeleteTask }) => {
           </a>
         </div>
       </div>
-      <div className="task__buttons">
-        {taskButtonChange}
-        <button
-          type="button"
-          className="task__button button-hover"
-          disabled={
-            formState.completed || formState.canEdit ? true : false
-          }
-          onClick={handleEditButtonClick}
-        >
-          Изменить
-        </button>
-        <button
-          type="button"
-          className="task__button button-hover"
-          disabled={formState.canEdit ? true : false}
-          onClick={() => handleDeleteTask(formState.id)}
-        >
-          Удалить
-        </button>
-      </div>
+      <TaskButtons
+        formState={formState}
+        handleCompleteTaskClick={handleCompleteTaskClick}
+        handleConfirm={handleConfirm}
+        handleEditButtonClick={handleEditButtonClick}
+        handleDeleteTask={handleDeleteTask}
+      />
     </form>
   );
 });

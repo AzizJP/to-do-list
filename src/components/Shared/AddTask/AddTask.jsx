@@ -1,8 +1,8 @@
 import { memo, useCallback, useState } from 'react';
 
-import './FormInput.css';
+import './AddTask.css';
 
-const FormInput = memo(({ handleAddTask }) => {
+const AddTask = memo(({ handleAddTask }) => {
   const [newTask, setNewTask] = useState({
     title: '',
   });
@@ -40,4 +40,4 @@ const FormInput = memo(({ handleAddTask }) => {
   );
 });
 
-export default FormInput;
+export default AddTask;
