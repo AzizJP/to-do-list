@@ -11,8 +11,17 @@ const FormInput = memo(({ handleAddTask }) => {
     setNewTask({ title: evt.target.value });
   }, []);
 
+  const handleSubmit = useCallback(
+    evt => {
+      evt.preventDefault();
+      handleAddTask(newTask);
+      setNewTask({ title: '' });
+    },
+    [newTask]
+  );
+
   return (
-    <div className="form__input-wrapper">
+    <form className="form__input-wrapper" onSubmit={handleSubmit}>
       <input
         type="text"
         className="form__input"
@@ -22,12 +31,12 @@ const FormInput = memo(({ handleAddTask }) => {
       />
       <button
         className="form__button button-hover"
-        onClick={() => handleAddTask(newTask)}
+        onClick={handleSubmit}
         disabled={!newTask.title}
       >
         Добавить
       </button>
-    </div>
+    </form>
   );
 });
 
